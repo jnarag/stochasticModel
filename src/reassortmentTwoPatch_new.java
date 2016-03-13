@@ -6,15 +6,16 @@
  * To change this template use File | Settings | File Templates.
  */
 import cern.colt.list.DoubleArrayList;
-import cern.jet.random.Normal;
 import cern.jet.random.Poisson;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jr207
@@ -37,6 +38,11 @@ public class reassortmentTwoPatch_new implements EpiModel{
     private boolean writeOutput = false;
     private boolean writeIncid = true;
 
+    private double tmrca1;
+    private double diversity1;
+    private double tmrca2;
+    private double diversity2;
+
     @Override
     public void runSimulation(EpiParams params) {
 
@@ -44,13 +50,13 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
         icoMatrix.initialize((int)1e6);
 
-        File outputfile = new File("two_patch_model_reassortants_antigenicMu_"+params.antigenMu+"mij_"+params.m_ij+"_psij_"+params.psi_i+"_"+params.psi_j+"_epsij_"+params.epsilon_endemic+"_"+params.epsilon_seasonal+
+        File outputfile = new File("two_patch_model_reassortants_antigenicMu_"+params.antigenicMu_a+"mij_"+params.m_ij+"_psij_"+params.psi_i+"_"+params.psi_j+"_epsij_"+params.epsilon_endemic+"_"+params.epsilon_seasonal+
                 "_D_"+params.durationOfInfection+"_W_"+params.waningImmunity+"_R0_"+params.R0+"_simTime_"+params.simulationTime+"yrs.csv");
 
 //        File iMatrix_output = new File("I_matrix_antigenicMu_"+params.antigenMu+"mij_"+params.m_ij+"_psii_"+params.psi_i+"_"+params.psi_j+"_simTime_"+params.simulationTime+"yrs.csv");
 //        File icoMatrix_outout = new File("Ico_matrix_mij_"+params.m_ij+"_psii_"+params.psi_i+"_"+params.psi_j+"_simTime_"+params.simulationTime+"yrs.csv");
 
-        File cumIncid = new File("cumulative_Incidence_antigenicMu_"+params.antigenMu+"mij_"+params.m_ij+"_psij_"+params.psi_i+"_"+params.psi_j+"_epsij_"+params.epsilon_endemic+"_"+params.epsilon_seasonal+
+        File cumIncid = new File("cumulative_Incidence_antigenicMu_"+params.antigenicMu_a+"mij_"+params.m_ij+"_psij_"+params.psi_i+"_"+params.psi_j+"_epsij_"+params.epsilon_endemic+"_"+params.epsilon_seasonal+
                 "_D_"+params.durationOfInfection+"_W_"+params.waningImmunity+"_R0_"+params.R0+"_simTime_"+params.simulationTime+"yrs.csv");
         //boolean writeOutput = false;
         try {
@@ -147,7 +153,9 @@ public class reassortmentTwoPatch_new implements EpiModel{
         double mij_S_j;
         double mij_R_j;
 
-        double evolve_i; // antigenic evolution in patch i
+        double evolve; // antigenic evolution in patch i
+        double evolve_large;
+
         double evolve_j; // antigenic evolution in patch j
 
         List<Integer> I_matrix_curr_i = getCurrentInfected(Y_curr_i, 0);  //current infections in patch i
@@ -177,12 +185,40 @@ public class reassortmentTwoPatch_new implements EpiModel{
         int cumIrp_j = 0;
         int cumIrs_j = 0;
 
+        double sampleTime = 365.25;
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+
         while (t_curr <= maxTime) {
 
+            double popFitness_i = getPopFitness(I_matrix_curr_i);
+            double popFitnessVariance_i = getPopFitnessVar(popFitness_i, I_matrix_curr_i);
+            double popFitness_j = getPopFitness(I_matrix_curr_j);
+            double popFitnessVariance_j = getPopFitnessVar(popFitness_j, I_matrix_curr_j);
+//            System.out.println(">"+t_curr+","+popFitness_i+","+popFitnessVariance_i+","+popFitness_j+","+popFitnessVariance_j);
+            //+X_curr_i+","+Y_curr_i+","+Yco_curr_i+","+Yr_primary_curr_i+","+Yr_curr_i+","+Z_curr_i+","+X_curr_j+","+Y_curr_j+","+Yco_curr_j+","+Yr_primary_curr_j+","+Yr_curr_j+","+Z_curr_j);
 
-            System.out.println(">"+t_curr+","+X_curr_i+","+Y_curr_i+","+Yco_curr_i+","+Yr_primary_curr_i+","+Yr_curr_i+","+Z_curr_i+","+X_curr_j+","+Y_curr_j+","+Yco_curr_j+","+Yr_primary_curr_j+","+Yr_curr_j+","+Z_curr_j);
+            if(t_curr==sampleTime) {
+//                updateDiversity(I_matrix_curr_j, 0);
+//
+//                double tmrca1 = tmrca;
+//                double diversity1 = diversity;
+
+                updateDiversity(I_matrix_curr_i);
+
+//                double tmrca2 = tmrca;
+//                double diversity2 = diversity;
+
+                System.out.println(t_curr + "," + (60-(t_curr-tmrca1) / 365.25) + "," + diversity1 / 365.25+"," + (60-(t_curr-tmrca2) / 365.25) + "," + diversity2 / 365.25);
+                sampleTime +=365.25;
+
+                if(t_curr/365.25 > 10) {
+                    stats.addValue(tmrca1/365.25);
+                }
+            }
+
             try {
-                writer.write(t_curr+","+X_curr_i+","+Y_curr_i+","+Yco_curr_i+","+Yr_primary_curr_i+","+Yr_curr_i+","+Z_curr_i+","+X_curr_j+","+Y_curr_j+","+Yco_curr_j+","+Yr_primary_curr_j+","+Yr_curr_j+","+Z_curr_j+"\n");
+                writer.write(t_curr+","+X_curr_i+","+Y_curr_i+","+Yco_curr_i+","+Yr_primary_curr_i+","+Yr_curr_i+","+Z_curr_i+","+popFitness_i+","+popFitnessVariance_i+","
+                                       +X_curr_j+","+Y_curr_j+","+Yco_curr_j+","+Yr_primary_curr_j+","+Yr_curr_j+","+Z_curr_j+","+popFitness_j+","+popFitnessVariance_j+"\n");
                 writer.flush();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -230,8 +266,11 @@ public class reassortmentTwoPatch_new implements EpiModel{
             mij_S_j = params.m_ij*X_curr_j;
             mij_R_j = params.m_ij*Z_curr_j;
 
-            evolve_i = params.antigenMu*Y_curr_i;     // antigenic evolution in patch 1
-            evolve_j = params.antigenMu*Y_curr_j;     // antigenic evolution in patch 2
+            evolve = params.p*params.antigenicMu_a*Y_curr_i; //ignoring evolution in coinfected since such small numbers comparatively
+            evolve_large = params.q*params.antigenicMu_b*Y_curr_i; //ignoring evolution in coinfected since such small numbers comparatively
+
+            // antigenic evolution in patch 1
+            evolve_j = params.antigenicMu_a*Y_curr_j;     // antigenic evolution in patch 2
 
             rates.add(muN_i);
             rates.add(BSIs_i);
@@ -266,8 +305,8 @@ public class reassortmentTwoPatch_new implements EpiModel{
             rates.add(mij_S_j);
             rates.add(mij_R_j);
 
-            rates.add(evolve_i);
-            rates.add(evolve_j);
+            rates.add(evolve);
+            rates.add(evolve_large);
 
             t_next = tau+t_curr;
 
@@ -354,6 +393,8 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             iMatrix.logFitness(newFitness);
                             iMatrix.logSegFitness(iMatrix.getSegFitness(parent));
                             iMatrix.logPatch(patch);
+                            iMatrix.logSeg1parent(parent);
+                            iMatrix.logSeg2parent(parent);
 
                             I_matrix_curr_i.add(I_matrix_length);
                             I_matrix_length++;
@@ -382,14 +423,14 @@ public class reassortmentTwoPatch_new implements EpiModel{
                         while(j<minNo) {
 
                             int Ico_index = (int)Math.floor(Math.random()*Ico_matrix_curr_i.size());
-                            int parentCo = Ico_matrix_curr_i.get(Ico_index);
+                            parent_co = Ico_matrix_curr_i.get(Ico_index);
 
                             int parent = (int)Double.NEGATIVE_INFINITY;
 
                             //how long has coinfected host been transmitting? Thus, tau = birth-t_curr and we're not using an average tau i.e 1/(Bco*S/N)
 
                             //double transmTime = t_curr-(Double)icoMatrixBirth.get(parentCo);  //So it is scaled in days
-                            double transmTime = t_curr-icoMatrix.getBirth(parentCo);  //So it is scaled in days
+                            double transmTime = t_curr-icoMatrix.getBirth(parent_co);  //So it is scaled in days
                             double nTrials = params.mutnRate*transmTime;
                             double reassortantLost = 1.0-1.0/(double)params.viralLoad;
                             double reassortantNotFixedInTau = Math.pow(reassortantLost,nTrials);
@@ -404,21 +445,26 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             double random = Math.random();
                             int virus = chooseEvent(coinfectedTransmission, random, 1.0);
 
-                            double newFitness = 0.0;double seg1Fitness = 0.0;
+                            double newFitness = 0.0;double seg1Fitness = 0.0;int seg1parent = (int)Double.NEGATIVE_INFINITY; int seg2parent = (int)Double.NEGATIVE_INFINITY;
                             if(virus>0) {
 
                                 reassortant = 0;
                                 if(virus==1){
 
-                                    parent = icoMatrix.getParent1(parentCo);//Integer)icoMatrixParent1.get(parentCo);
+                                    parent = icoMatrix.getParent1(parent_co);//Integer)icoMatrixParent1.get(parentCo);
                                     newFitness = iMatrix.getFitness(parent);//+errorDistribution.nextDouble();
                                     seg1Fitness = iMatrix.getSegFitness(parent);
+                                    seg1parent = parent;
+                                    seg2parent = parent;
+
                                 }
                                 else{
 //
-                                    parent = icoMatrix.getParent2(parentCo);//Integer)icoMatrixParent2.get(parentCo);
+                                    parent = icoMatrix.getParent2(parent_co);//Integer)icoMatrixParent2.get(parentCo);
                                     newFitness = iMatrix.getFitness(parent);//+errorDistribution.nextDouble();
                                     seg1Fitness = iMatrix.getSegFitness(parent);
+                                    seg1parent = parent;
+                                    seg2parent = parent;
                                 }
 
                             }
@@ -426,11 +472,11 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
                                 reassortant = 1;
 
-                                double parent1Fitness = iMatrix.getFitness(icoMatrix.getParent1(parentCo));
-                                double parent2Fitness = iMatrix.getFitness(icoMatrix.getParent2(parentCo));
+                                double parent1Fitness = iMatrix.getFitness(icoMatrix.getParent1(parent_co));
+                                double parent2Fitness = iMatrix.getFitness(icoMatrix.getParent2(parent_co));
 
-                                double seg1Fitness_p1 = iMatrix.getSegFitness(icoMatrix.getParent1(parentCo));
-                                double seg1Fitness_p2 = iMatrix.getSegFitness(icoMatrix.getParent2(parentCo));
+                                double seg1Fitness_p1 = iMatrix.getSegFitness(icoMatrix.getParent1(parent_co));
+                                double seg1Fitness_p2 = iMatrix.getSegFitness(icoMatrix.getParent2(parent_co));
 
                                 double seg2Fitness_p1 = parent1Fitness-seg1Fitness_p1;
                                 double seg2Fitness_p2 = parent2Fitness-seg1Fitness_p2;
@@ -442,11 +488,17 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
                                     newFitness = seg1Fitness_p1 + seg2Fitness_p2;
                                     seg1Fitness = seg1Fitness_p1;
+                                    seg1parent = icoMatrix.getParent1(parent_co);
+                                    seg2parent = icoMatrix.getParent2(parent_co);
+
                                 }
                                 else{       // seg 2 inherited from parent 2 and seg 2 inherited from parent 1
 
                                     newFitness = seg1Fitness_p2 + seg2Fitness_p1;
                                     seg1Fitness = seg1Fitness_p2;
+                                    seg1parent = icoMatrix.getParent2(parent_co);
+                                    seg2parent = icoMatrix.getParent1(parent_co);
+
 
                                 }
 
@@ -465,11 +517,14 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             iMatrix.logBirth(t_curr);
                             iMatrix.logDeath(Double.NEGATIVE_INFINITY);
                             iMatrix.logParent(parent);
-                            iMatrix.logParentCo(parentCo);
+                            iMatrix.logParentCo(parent_co);
                             iMatrix.logReassortant(reassortant);
                             iMatrix.logFitness(newFitness);
                             iMatrix.logSegFitness(seg1Fitness);
                             iMatrix.logPatch(patch);
+                            iMatrix.logSeg1parent(seg1parent);
+                            iMatrix.logSeg2parent(seg2parent);
+
 
                            I_matrix_curr_i.add(I_matrix_length);
                             I_matrix_length++;
@@ -709,6 +764,8 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             iMatrix.logFitness(newFitness);
                             iMatrix.logSegFitness(iMatrix.getSegFitness(parent));
                             iMatrix.logPatch(patch);
+                            iMatrix.logSeg1parent(parent);
+                            iMatrix.logSeg2parent(parent);
 
                          I_matrix_curr_j.add(I_matrix_length);
                             I_matrix_length++;
@@ -735,7 +792,7 @@ public class reassortmentTwoPatch_new implements EpiModel{
                         while(j<minNo) {
 
                             int Ico_index = (int)Math.floor(Math.random()*Ico_matrix_curr_j.size());
-                            int parentCo = Ico_matrix_curr_j.get(Ico_index);
+                            parent_co = Ico_matrix_curr_j.get(Ico_index);
 
                             //currentCoinfectedHistory = Ico_matrix.get(coinfected);
 
@@ -745,7 +802,7 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             //how long has coinfected host been transmitting? Thus, tau = birth-t_curr and we're not using an average tau i.e 1/(Bco*S/N)
 
                             //double transmTime = t_curr-(Double)icoMatrixBirth.get(coinfected);  //So it is scaled in days
-                            double transmTime = t_curr-icoMatrix.getBirth(parentCo);
+                            double transmTime = t_curr-icoMatrix.getBirth(parent_co);
                             double nTrials = params.mutnRate*transmTime;
                             double reassortantLost = 1.0-1.0/(double)params.viralLoad;
                             double reassortantNotFixedInTau = Math.pow(reassortantLost,nTrials);
@@ -759,21 +816,25 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
                             double random = Math.random();
                             int virus = chooseEvent(coinfectedTransmission, random, 1.0);
-                            double newFitness = 0.0;double seg1Fitness = 0.0;
+                            double newFitness = 0.0;double seg1Fitness = 0.0;int seg1parent = (int)Double.NEGATIVE_INFINITY; int seg2parent = (int)Double.NEGATIVE_INFINITY;
                             if(virus>0) {
 
                                 reassortant = 0;
                                 if(virus==1){
 
-                                    parent = icoMatrix.getParent1(parentCo);
+                                    parent = icoMatrix.getParent1(parent_co);
                                     newFitness = iMatrix.getFitness(parent);// + errorDistribution.nextDouble();
                                     seg1Fitness = iMatrix.getSegFitness(parent);
+                                    seg1parent = parent;
+                                    seg2parent = parent;
                                 }
                                 else{
 
-                                    parent = icoMatrix.getParent2(parentCo);
+                                    parent = icoMatrix.getParent2(parent_co);
                                     newFitness = iMatrix.getFitness(parent);// + errorDistribution.nextDouble();
                                     seg1Fitness = iMatrix.getSegFitness(parent);
+                                    seg1parent = parent;
+                                    seg2parent = parent;
                                 }
 
                             }
@@ -781,11 +842,11 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
                                 reassortant = 1;
 
-                                double parent1Fitness = iMatrix.getFitness(icoMatrix.getParent1(parentCo));
-                                double parent2Fitness = iMatrix.getFitness(icoMatrix.getParent2(parentCo));
+                                double parent1Fitness = iMatrix.getFitness(icoMatrix.getParent1(parent_co));
+                                double parent2Fitness = iMatrix.getFitness(icoMatrix.getParent2(parent_co));
 
-                                double seg1Fitness_p1 = iMatrix.getSegFitness(icoMatrix.getParent1(parentCo));
-                                double seg1Fitness_p2 = iMatrix.getSegFitness(icoMatrix.getParent2(parentCo));
+                                double seg1Fitness_p1 = iMatrix.getSegFitness(icoMatrix.getParent1(parent_co));
+                                double seg1Fitness_p2 = iMatrix.getSegFitness(icoMatrix.getParent2(parent_co));
 
                                 double seg2Fitness_p1 = parent1Fitness-seg1Fitness_p1;
                                 double seg2Fitness_p2 = parent2Fitness-seg1Fitness_p2;
@@ -799,11 +860,15 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
                                     newFitness = seg1Fitness_p1 + seg2Fitness_p2;
                                     seg1Fitness = seg1Fitness_p1;
+                                    seg1parent = icoMatrix.getParent1(parent_co);
+                                    seg2parent = icoMatrix.getParent2(parent_co);
                                 }
                                 else{       // seg 2 inherited from parent 2 and seg 2 inherited from parent 1
 
                                     newFitness = seg1Fitness_p2 + seg2Fitness_p1;
                                     seg1Fitness = seg1Fitness_p2;
+                                    seg1parent = icoMatrix.getParent2(parent_co);
+                                    seg2parent = icoMatrix.getParent1(parent_co);
 
                                 }
 
@@ -821,11 +886,13 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             iMatrix.logBirth(t_curr);
                             iMatrix.logDeath(Double.NEGATIVE_INFINITY);
                             iMatrix.logParent(parent);
-                            iMatrix.logParentCo(parentCo);
+                            iMatrix.logParentCo(parent_co);
                             iMatrix.logReassortant(reassortant);
                             iMatrix.logFitness(newFitness);
                             iMatrix.logSegFitness(seg1Fitness);
                             iMatrix.logPatch(patch);
+                            iMatrix.logSeg1parent(seg1parent);
+                            iMatrix.logSeg2parent(seg2parent);
                             I_matrix_curr_j.add(I_matrix_length);
                             I_matrix_length++;
 
@@ -1132,6 +1199,9 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             iMatrix.logReassortant(iMatrix.getReassortant(mig_Is));
                             iMatrix.logFitness(iMatrix.getFitness(mig_Is));
                             iMatrix.logSegFitness(iMatrix.getSegFitness(mig_Is));
+                            iMatrix.logSeg1parent(mig_Is);
+                            iMatrix.logSeg2parent(mig_Is);
+
                             iMatrix.logPatch(patch);
 
                             I_matrix_length++;
@@ -1260,6 +1330,9 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             iMatrix.logReassortant(iMatrix.getReassortant(mig_Is));
                             iMatrix.logFitness(iMatrix.getFitness(mig_Is));
                             iMatrix.logSegFitness(iMatrix.getSegFitness(mig_Is));
+                            iMatrix.logSeg1parent(mig_Is);
+                            iMatrix.logSeg2parent(mig_Is);
+
                             iMatrix.logPatch(patch);
 
                          j++;
@@ -1293,7 +1366,7 @@ public class reassortmentTwoPatch_new implements EpiModel{
                             Integer evolvedIs = I_matrix_curr_i.get(index);
                             double currentFitness = iMatrix.getFitness(evolvedIs);
 
-                            double newFitness = currentFitness + Math.log10((1+(params.dfe)));
+                            double newFitness = currentFitness + Math.log10((1+(params.s_b1)));
 
                             iMatrix.setFitness(evolvedIs, newFitness);
                             iMatrix.setSegFitness(evolvedIs, newFitness);
@@ -1302,16 +1375,16 @@ public class reassortmentTwoPatch_new implements EpiModel{
                         }
                         break;
                     case 31:
-                        //antigenic evolution in patch 2
+                        //antigenic evolution in patch 1 - large
                         j = 0;
 
                         while(j<num){
 
-                            int index = (int)Math.floor(Math.random()*I_matrix_curr_j.size());
-                            Integer evolvedIs = I_matrix_curr_j.get(index);
+                            int index = (int)Math.floor(Math.random()*I_matrix_curr_i.size());
+                            Integer evolvedIs = I_matrix_curr_i.get(index);
                             double currentFitness = iMatrix.getFitness(evolvedIs);
                             //double newFitness =currentFitness*(1+params.dfe.nextDouble());
-                            double newFitness = currentFitness + Math.log10((1+(params.dfe)));
+                            double newFitness = currentFitness + Math.log10((1+(params.s_large)));
 
                             iMatrix.setFitness(evolvedIs, newFitness);
                             iMatrix.setSegFitness(evolvedIs, newFitness);
@@ -1386,7 +1459,34 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
 
 
+    public double getPopFitness(List<Integer> I_curr) {
 
+        Double totalFitness = 0.0;
+        for(Integer i: I_curr) {
+
+            totalFitness += iMatrix.getFitness(i);
+        }
+
+        //System.out.println("Pop fitness: "+ totalFitness/I_curr.size());
+
+        return totalFitness/I_curr.size();
+
+
+    }
+
+    public double getPopFitnessVar(double popFitness, List<Integer> I_curr) {
+
+        Double totalSquaredDeviations = 0.0;
+
+        for(Integer i: I_curr) {
+
+            totalSquaredDeviations += Math.pow((iMatrix.getFitness(i)-popFitness), 2);
+
+        }
+
+        return totalSquaredDeviations/I_curr.size();
+
+    }
     private void initializeI_matrix(int Y_curr_i, int Y_curr_j) {
         for(int i=0;i<Y_curr_i;i++) {
 
@@ -1399,6 +1499,9 @@ public class reassortmentTwoPatch_new implements EpiModel{
             iMatrix.logFitness(0.0);
             iMatrix.logSegFitness(0.0);
             iMatrix.logPatch(1);
+            iMatrix.logSeg1parent((int)Double.NEGATIVE_INFINITY);
+            iMatrix.logSeg2parent((int)Double.NEGATIVE_INFINITY);
+
 
 //            if(writeOutput){
 //                try {
@@ -1422,6 +1525,9 @@ public class reassortmentTwoPatch_new implements EpiModel{
             iMatrix.logFitness(0.0);
             iMatrix.logSegFitness(0.0);
             iMatrix.logPatch(2);
+            iMatrix.logSeg1parent((int)Double.NEGATIVE_INFINITY);
+            iMatrix.logSeg2parent((int)Double.NEGATIVE_INFINITY);
+
 
 //            if(writeOutput) {
 //                try {
@@ -1643,6 +1749,133 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
     }
 
+    private int commonAncestor(int i1, int i2, int seg) {
+
+        int commonAnc = (int)Double.NEGATIVE_INFINITY;
+        int lineageA = i1;
+        int lineageB = i2;
+        Set<Integer> ancestry = new HashSet<Integer>();
+        if(seg==0) {
+            while (true) {
+
+                if (iMatrix.getSeg1parent(lineageA) != (int) Double.NEGATIVE_INFINITY) {
+
+                    lineageA = iMatrix.getSeg1parent(lineageA);
+                    if (!ancestry.add(lineageA)) {
+                        commonAnc = lineageA;
+                        break;
+                    }
+                }
+                if (iMatrix.getSeg1parent(lineageB) != (int) Double.NEGATIVE_INFINITY) {
+
+                    lineageB = iMatrix.getSeg1parent(lineageB);
+                    if (!ancestry.add(lineageB)) {
+                        commonAnc = lineageB;
+                        break;
+                    }
+                }
+                if (iMatrix.getSeg1parent(lineageA) == (int) Double.NEGATIVE_INFINITY && iMatrix.getSeg1parent(lineageB) == (int) Double.NEGATIVE_INFINITY) {
+                    break;
+                }
+
+            }
+        }
+        else{
+            while (true) {
+
+                if (iMatrix.getSeg2parent(lineageA) != (int) Double.NEGATIVE_INFINITY) {
+
+                    lineageA = iMatrix.getSeg2parent(lineageA);
+                    if (!ancestry.add(lineageA)) {
+                        commonAnc = lineageA;
+                        break;
+                    }
+                }
+                if (iMatrix.getSeg2parent(lineageB) != (int) Double.NEGATIVE_INFINITY) {
+
+                    lineageB = iMatrix.getSeg2parent(lineageB);
+                    if (!ancestry.add(lineageB)) {
+                        commonAnc = lineageB;
+                        break;
+                    }
+                }
+                if (iMatrix.getSeg2parent(lineageA) == (int) Double.NEGATIVE_INFINITY && iMatrix.getSeg2parent(lineageB) == (int) Double.NEGATIVE_INFINITY) {
+                    break;
+                }
+
+            }
+        }
+        return commonAnc;
+    }
+
+    private double distance(int i1, int i2, int seg) {
+
+
+        int ancestor = commonAncestor(i1,i2,seg);
+        if(ancestor!= (int)Double.NEGATIVE_INFINITY) {
+
+            double distA = iMatrix.getBirth(i1) - iMatrix.getBirth(ancestor);
+            double distB = iMatrix.getBirth(i2) - iMatrix.getBirth(ancestor);
+            return distA + distB;
+        }
+        else{
+            return 0;
+
+        }
+    }
+
+    public void updateDiversity(List<Integer> I_matrix_curr) {
+        diversity1 = 0.0;
+        tmrca1 = 0.0;
+        diversity2 = 0.0;
+        tmrca2 = 0.0;
+        int sampleCount1 = 0;
+        int sampleCount2 = 0;
+
+
+        //Collections.shuffle(I_matrix_curr);
+
+        int samplingDepth = I_matrix_curr.size()/100;
+        //System.out.println(samplingDepth);
+
+        for (int i = 0; i < 100; i++) {
+
+
+            int j = samplingDepth*i;
+            //System.out.println(j);
+            Integer vA = I_matrix_curr.get(j);
+            Integer vB = I_matrix_curr.get(j+1);
+            if (vA != (int)Double.NEGATIVE_INFINITY && vB != (int)Double.NEGATIVE_INFINITY) {
+                double dist = distance(vA, vB, 0);
+                diversity1 += dist;
+                if (dist > tmrca1) {
+                    tmrca1 = dist;
+                }
+                sampleCount1 += 1;
+            }
+
+            if (vA != (int)Double.NEGATIVE_INFINITY && vB != (int)Double.NEGATIVE_INFINITY) {
+                double dist = distance(vA, vB, 1);
+                diversity2 += dist;
+                if (dist > tmrca2) {
+                    tmrca2 = dist;
+                }
+                sampleCount2 += 1;
+            }
+        }
+        if (sampleCount1 > 0) {
+            diversity1 /= (double) sampleCount1;
+        }
+        if (sampleCount2 > 0) {
+            diversity2 /= (double) sampleCount2;
+
+        }
+        tmrca1 /= 2.0;
+        tmrca2 /= 2.0;
+
+    }
+
+
     public coinfectionHistory getIcoMatrix() {
         return icoMatrix;
     }
@@ -1651,6 +1884,7 @@ public class reassortmentTwoPatch_new implements EpiModel{
 
         EpiParams params = new EpiParams();
         reassortmentTwoPatch_new twoPatchModel = new reassortmentTwoPatch_new();
+
         twoPatchModel.runSimulation(params);
 
     }

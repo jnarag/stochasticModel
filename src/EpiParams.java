@@ -12,22 +12,22 @@ import cern.jet.random.engine.RandomEngine;
 public class EpiParams {
 
     //default parameter values?
-    static int N = (int)7e6;
-    static double R0 = 3;
+    static int N = (int)3e6;
+    static double R0 = 3.0;
     static int lifeSpan = 30;  //in years
     static int durationOfInfection = 5; // in days
     static int waningImmunity = 4; //in years
 
     static double psi = 0.0;
-    static double psi_i = 1.0;
-    static double psi_j = 1.0;
+    static double psi_i = 0.5;
+    static double psi_j = 0.5;
     static double epsilon = 0.0;
-    static double simulationTime = 40;
+    static double simulationTime = 60;
     static double simulationStartTime = 0.0;
     static double simulationEndTime = simulationTime*365.25;
 
     static int viralLoad = 1000;
-    static int mutnRate = 500;
+    static int mutnRate = 500; //500 gives 6e-3; 10 gives 4e-4
 
     static double gamma = 1.0/((double)waningImmunity*365.25);
     static double mig = 0.0;
@@ -39,19 +39,19 @@ public class EpiParams {
 
     //initial conditions - start at equilibrium values:
     static int S_init = (int)Math.floor(N/R0);
-    static int Is_init = 25000;//(int)Math.floor((mu*N)/(beta_s*(R0-1.0)));
+    static int Is_init = 8000;//(int)Math.floor((mu*N)/(beta_s*(R0-1.0)));
     static int Ico_init = 40;//(int)Math.floor(beta_co/((N*(nu_co+mu))*(Math.pow(Is_init,2))));
     static int R_init = N-S_init-Is_init-Ico_init;
 
     static double epsilon_endemic = 0.0;
     static double epsilon_seasonal = 0.15;
-    static double m_ij = 0.001;
-    static int Is_init_i = 25000;
-    static int Is_init_j = 25000;
+    static double m_ij = 0.0005;
+    static int Is_init_i = 8000;//(int)Math.floor((mu*N)/(beta_s*(R0-1.0)));;
+    static int Is_init_j = 8000;//(int)Math.floor((mu*N)/(beta_s*(R0-1.0)));;
     static int S_init_i = S_init;
     static int S_init_j = S_init;
-    static int Ico_init_i = 40;
-    static int Ico_init_j = 40;
+    static int Ico_init_i = 10; //(int)Math.floor(beta_co/((N*(nu_co+mu))*(Math.pow(Is_init_i,2))));;
+    static int Ico_init_j = 10;//(int)Math.floor(beta_co/((N*(nu_co+mu))*(Math.pow(Is_init_j,2))));;
     static int R_init_i = N-S_init_i-Is_init_i-Ico_init_i;
     static int R_init_j = N-S_init_j-Is_init_j-Ico_init_j;
 
@@ -59,14 +59,38 @@ public class EpiParams {
 
     //antigenic evolution parameters;
 
-    static double antigenMu = 0.00; //antigenic mutation rate (rate of beneficial mutations)
-    static double meanEffect = 0.001;//0.017; //average selection coefficient (from Sanjuan et al (2004) empirical estimate of mean beneficial mutation mutation effect)
+    static double antigenicMu_a = 0.0005; //antigenic mutation rate (rate of beneficial mutations)
+    static double antigenicMu_b = 0.000005; // antigenic mutation rate for large effect mutations
+    static double meanEffect = 0.00038;//0.017; //average selection coefficient (from Sanjuan et al (2004) empirical estimate of mean beneficial mutation mutation effect)
     static double sdEffect = 0.012; //standard deviation of mutational effect;
     //static Gamma dfe = new Gamma((meanEffect*meanEffect)/(sdEffect*sdEffect), meanEffect/(sdEffect*sdEffect), randomGenerator);
 
-    static double dfe = meanEffect;
-    static Exponential expDFE = new Exponential(dfe, randomGenerator);
+    static double s_b1 = meanEffect;
+    static double s_b2 = meanEffect;
+    static double s_large = 0.014;
+    static double s_n1 = 0.005;
+    static double s_n2 = 0.005;
+    static double e_b = 0.0;
+    static double deleteriousMu = 0.000;
+    static double neutralMu = 0.0001;
+    static double negSel = 0.0001;
 
+    static double deleteriousEffect = 0.00000;
+    static double mean_n = 0.6;
+    static double variance_n = 0.4*0.4;
+    static double alpha = mean_n*mean_n/(variance_n);
+    static double lambda = mean_n/variance_n;
+    static double p = 1; //prob of being in the continuous selection regime
+    static double q = 1.0-p; //prob of being in the episodic selection regime
+
+    static double antigenicMu = 0.00075;
+    static double nonAntigenicMu = 0.1;
+    static double s_ben = 0.012;
+    static Exponential benDFE = new Exponential(1/s_ben, randomGenerator);
+    static double s_del = 0.008;
+    static Exponential delDFE = new Exponential(1/s_del, randomGenerator);
+    static double p_ben1 = 0.77;
+    static double p_ben2 = 0.05;
 
     public void print() {
 
@@ -119,10 +143,33 @@ public class EpiParams {
 
         System.out.println();
         System.out.println("*** Antigenic evolution parameters ***");
-        System.out.println("Antigenic mutation rate: "+ antigenMu);
-        //System.out.println("Mean mutational effect: "+meanEffect);
-        //System.out.println("SD mutational effect: "+sdEffect);
-        System.out.println("Mean dfe: "+dfe);
+//        System.out.println("Antigenic mutation rate1: "+ antigenicMu_a);
+//        System.out.println("Antigenic mutation rate2: "+antigenicMu_b);
+//        System.out.println("Antigenic mutation rate3: "+ negSel);
+//
+//        //System.out.println("SD mutational effect: "+sdEffect);
+//        System.out.println("Mean dfe: "+s_b1);
+//        System.out.println("Large effect: "+s_b2);
+//        System.out.println("Del effect seg1: "+s_n1);
+//        System.out.println("Del effect seg2: "+s_n2);
+//
+//
+//        System.out.println("Seg2 mutation rate: "+neutralMu);
+//        System.out.println("mean: "+mean_n);
+//        System.out.println("variance: "+variance_n);
+
+
+
+//        System.out.println("p: "+p);
+//        System.out.println("q: "+q);
+
+        System.out.println("Antigenic mutation rate: "+antigenicMu);
+        System.out.println("Non-antigenic mutation rate: "+ nonAntigenicMu);
+        System.out.println("s_b: "+s_ben+", s_d: "+s_del);
+        System.out.println("p_b1: "+p_ben1+", p_b2: "+p_ben2);
+//        System.out.println("deleterious mutation rate: "+ deleteriousMu);
+//        System.out.println("deleterious mutation s: "+ deleteriousEffect);
+
 
         System.out.println("...............................................");
 

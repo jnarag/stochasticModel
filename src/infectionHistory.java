@@ -19,6 +19,12 @@ public class infectionHistory implements iHistory {
     List<Double> fitness = null;
     List<Double> segment1Fitness = null;
     List<Integer> patch = null;
+    //List<List<Double>> immuneHistory = null;
+
+
+
+    List<Integer> seg1parent = null;
+    List<Integer> seg2parent = null;
 
     public infectionHistory (int size) {
 
@@ -31,6 +37,10 @@ public class infectionHistory implements iHistory {
         fitness = new ArrayList<Double>(size);
         segment1Fitness = new ArrayList<Double>(size);
         patch = new ArrayList<Integer>(size);
+        seg1parent = new ArrayList<Integer>(size);
+        seg2parent = new ArrayList<Integer>(size);
+        //immuneHistory = new ArrayList<List<Double>>(size);
+
 
     }
 
@@ -45,32 +55,44 @@ public class infectionHistory implements iHistory {
         fitness = new ArrayList<Double>();
         segment1Fitness = new ArrayList<Double>();
         patch = new ArrayList<Integer>();
+        seg1parent = new ArrayList<Integer>();
+        seg2parent = new ArrayList<Integer>();
+        //immuneHistory = new ArrayList<List<Double>>();
+
 
     }
 
-    public infectionHistory (infectionHistory iMatrix) {
-
-        id = new ArrayList<Integer>();
-        birth = new ArrayList<Double>();
-        death = new ArrayList<Double>();
-        parent = new ArrayList<Integer>();
-        parentCo = new ArrayList<Integer>();
-        reassortant = new ArrayList<Integer>();
-        fitness = new ArrayList<Double>();
-        segment1Fitness = new ArrayList<Double>();
-        patch = new ArrayList<Integer>();
-
-        id.addAll(iMatrix.getId());
-        birth.addAll(iMatrix.getBirth());
-        death.addAll(iMatrix.getDeath());
-        parent.addAll(iMatrix.getParent());
-        parentCo.addAll(iMatrix.getParentCo());
-        reassortant.addAll(iMatrix.getReassortant());
-        fitness.addAll(iMatrix.getFitness());
-        segment1Fitness.addAll(iMatrix.getSegFitness());
-        patch.addAll(iMatrix.getPatch());
-
-    }
+//    public infectionHistory (infectionHistory iMatrix) {
+//
+//        id = new ArrayList<Integer>();
+//        birth = new ArrayList<Double>();
+//        death = new ArrayList<Double>();
+//        parent = new ArrayList<Integer>();
+//        parentCo = new ArrayList<Integer>();
+//        reassortant = new ArrayList<Integer>();
+//        fitness = new ArrayList<Double>();
+//        segment1Fitness = new ArrayList<Double>();
+//        patch = new ArrayList<Integer>();
+//        seg1parent = new ArrayList<Integer>();
+//        seg2parent = new ArrayList<Integer>();
+//        immuneHistory = new ArrayList<List<Double>>();
+//
+//
+//        id.addAll(iMatrix.getId());
+//        birth.addAll(iMatrix.getBirth());
+//        death.addAll(iMatrix.getDeath());
+//        parent.addAll(iMatrix.getParent());
+//        parentCo.addAll(iMatrix.getParentCo());
+//        reassortant.addAll(iMatrix.getReassortant());
+//        fitness.addAll(iMatrix.getFitness());
+//        segment1Fitness.addAll(iMatrix.getSegFitness());
+//        patch.addAll(iMatrix.getPatch());
+//        seg1parent.addAll(iMatrix.getSeg1parent());
+//        seg2parent.addAll(iMatrix.getSeg2parent());
+//        immuneHistory.addAll(iMatrix.getImmuneHistory());
+//
+//
+//    }
 
     public infectionHistory (List<Integer> id, List<Double> birth, List<Double> death) {
 
@@ -117,6 +139,18 @@ public class infectionHistory implements iHistory {
         this.patch.add(patch);
     }
 
+//    public void logImmuneHistory(int id, double sigma) {
+//
+//        this.immuneHistory.get(id).add(sigma);
+//    }
+
+    public void logSeg1parent(int parent) {
+        this.seg1parent.add(parent);
+    }
+    public void logSeg2parent(int parent) {
+        this.seg2parent.add(parent);
+    }
+
     public void setBirth(int index, double birth){
 
         this.birth.set(index, birth);
@@ -149,6 +183,19 @@ public class infectionHistory implements iHistory {
     public void setPatch(int index, int patch) {
 
         this.patch.set(index, patch);
+    }
+//    public void setImmuneHistory(int index, List<Double> immuneHistory) {
+//
+//        this.immuneHistory.set(index, immuneHistory);
+//    }
+
+    public void setSeg1parent(int index, int parent) {
+        this.seg1parent.set(index, parent);
+    }
+
+    public void setSeg2parent(int index, int parent) {
+        this.seg2parent.set(index, parent);
+
     }
 
     public int getId(int index) {
@@ -190,6 +237,18 @@ public class infectionHistory implements iHistory {
 
         return this.patch.get(index);
     }
+//    public List<Double> getImmuneHistory(int index) {
+//
+//        return this.immuneHistory.get(index);
+//    }
+
+    public int getSeg1parent(int index) {
+        return this.seg1parent.get(index);
+    }
+    public int getSeg2parent(int index) {
+        return this.seg2parent.get(index);
+    }
+
 
     public void addEntry(infectionHistory matrix, int i) {
 
@@ -202,6 +261,8 @@ public class infectionHistory implements iHistory {
         logFitness(matrix.getFitness(i));
         logSegFitness(matrix.getSegFitness(i));
         logPatch(matrix.getPatch(i));
+        logSeg1parent(matrix.getSeg1parent(i));
+        logSeg2parent(matrix.getSeg2parent(i));
     }
 
     public List<Integer> getId() {
@@ -231,6 +292,9 @@ public class infectionHistory implements iHistory {
     public List<Integer> getPatch() {
         return this.patch;
     }
+    public List<Integer> getSeg1parent() { return this.seg1parent;}
+    public List<Integer> getSeg2parent() { return this.seg2parent;}
+
 
 
     public infectionHistory getInfectionHistory() {
@@ -246,6 +310,8 @@ public class infectionHistory implements iHistory {
         iMatrix.reassortant.addAll(this.reassortant);
         iMatrix.fitness.addAll(this.fitness);
         iMatrix.segment1Fitness.addAll(this.segment1Fitness);
+        iMatrix.seg1parent.addAll(this.seg1parent);
+        iMatrix.seg2parent.addAll(this.seg2parent);
         iMatrix.patch.addAll(this.patch);
 
         return iMatrix;

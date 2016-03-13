@@ -7,8 +7,16 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="stochasticModel" />
-    <orderEntry type="library" name="colt" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../ssj/lib/ssj.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" exported="" name="colt" level="project" />
     <orderEntry type="library" name="commons-math3-3" level="project" />
     <orderEntry type="library" name="simulateGenealogy" level="project" />
   </component>
