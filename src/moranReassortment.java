@@ -45,16 +45,7 @@ public class moranReassortment implements EpiModel {
     public void runSimulation(EpiParams params, int sim_no, double [][] tmrca_seg1, double [][] tmrca_seg2, double [][] fitness, double[][] fitnessv, double [][] fitness_1, double[][] fitnessv_1, double [][] fitness_2, double[][] fitnessv_2) {
 
 
-        //params.print();
 
-        //System.out.println(Math.log10(Double.NEGATIVE_INFINITY));
-
-//        File outputfile = new File("moran_model_reassortants_antigenicMu_"+params.rawMutationRate+"_pb1_"+params.p_b_seg1+"_pb2_"+params.p_b_seg2+"_pd1_"+params.p_d_seg1+"_pd2_"+params.p_d_seg2+"_psi_"+params.psi+"_D_"+params.durationOfInfection+"_N_"+(params.Is_init+params.Ico_init)+"_simTime_"+params.simulationTime+"yrs_simNo_"+(sim_no+1)+".csv");
-
-        //File cumIncid = new File("moranModel_cumulative_Incidence_antigenicMu_"+params.rawMutationRate+"_sb1_"+params.p_b_seg1+"_sb2_"+params.p_b_seg2+"_sd1_"+params.p_d_seg1+"_sd1_"+params.p_d_seg2+"_psi_"+params.psi+"_D_"+params.durationOfInfection+"_W_"+params.waningImmunity+"_R0_"+params.R0+"_simTime_"+params.simulationTime+"yrs_simNo_"+(sim_no+1)+".csv");
-
-//        File fitnessDist = new File("fitness_distribution_over_time_"+params.rawMutationRate+"_pb1_"+params.p_b_seg1+"_pb2_"+params.p_b_seg2+"_pd1_"+params.p_d_seg1+"_pd2_"+params.p_d_seg2+"_psi_"+params.psi+"_D_"+params.durationOfInfection+"_N_"+(params.Is_init+params.Ico_init)+"_simTime_"+params.simulationTime+"yrs_simNo_"+(sim_no+1)+".csv");
-//
 
         Map<Double, Map<String, Double>> fitDistTime = new HashMap<Double, Map<String, Double>>();
 
@@ -653,8 +644,6 @@ public class moranReassortment implements EpiModel {
                                 double seg1fitness_new = 0.0;
                                 double seg2fitness_new = 0.0;
 
-                                double e = 0;
-
                                 for (int s1 = 0; s1 < n_b_seg1; s1++) {
 
                                     double sb = params.benDFE.nextDouble();
@@ -669,18 +658,8 @@ public class moranReassortment implements EpiModel {
 
                                         }
                                     }
-                                    if (e < 0 || e > 1) {
 
-                                        while (e < 0 || e > 1) {
-
-                                            e = params.epistasis.nextDouble();
-
-
-                                        }
-
-                                    }
-
-                                    seg1fitness_new += (Math.log10(1 + sb) + Math.log10(1+e));
+                                    seg1fitness_new += (Math.log10(1 + sb));
 
                                 }
                                 for (int s1 = 0; s1 < n_d_seg1; s1++) {
@@ -695,19 +674,9 @@ public class moranReassortment implements EpiModel {
 
                                         }
                                     }
-                                    if (e < 0 || e > 1) {
-
-                                        while (e < 0 || e > 1) {
-
-                                            e = params.epistasis.nextDouble();
 
 
-                                        }
-
-                                    }
-
-
-                                    seg1fitness_new += (Math.log10(1 - sd)+ Math.log10(1+e));
+                                    seg1fitness_new += (Math.log10(1 - sd));
                                 }
 
                                 for (int s2 = 0; s2 < n_b_seg2; s2++) {
@@ -724,18 +693,9 @@ public class moranReassortment implements EpiModel {
 
                                         }
                                     }
-                                    if (e < 0 || e > 1) {
-
-                                        while (e < 0 || e > 1) {
-
-                                            e = params.epistasis.nextDouble();
 
 
-                                        }
-
-                                    }
-
-                                    seg2fitness_new += (Math.log10(1 + sb) + Math.log10(1+e));
+                                    seg2fitness_new += (Math.log10(1 + sb));
                                 }
 
                                 for (int s2 = 0; s2 < n_d_seg2; s2++) {
@@ -750,18 +710,9 @@ public class moranReassortment implements EpiModel {
 
                                         }
                                     }
-                                    if (e < 0 || e > 1) {
-
-                                        while (e < 0 || e > 1) {
-
-                                            e = params.epistasis.nextDouble();
 
 
-                                        }
-
-                                    }
-
-                                    seg2fitness_new += (Math.log10(1 - sd) + Math.log10(1+e));
+                                    seg2fitness_new += (Math.log10(1 - sd));
 
                                 }
 
@@ -1075,7 +1026,6 @@ public class moranReassortment implements EpiModel {
                             double seg1fitness_new = 0.0;
                             double seg2fitness_new = 0.0;
 
-                            double e = 0;
 
                             for (int s1 = 0; s1 < n_b_seg1; s1++) {
 
@@ -1091,15 +1041,8 @@ public class moranReassortment implements EpiModel {
                                     }
                                 }
 
-                                if (e < 0 || e > 1) {
 
-                                    while (e < 0 || e > 1) {
-
-                                        e = params.epistasis.nextDouble();
-                                    }
-                                }
-
-                                seg1fitness_new += (Math.log10(1 + sb) + Math.log10(1+e));
+                                seg1fitness_new += (Math.log10(1 + sb));
 
                             }
 
@@ -1116,15 +1059,7 @@ public class moranReassortment implements EpiModel {
                                     }
                                 }
 
-                                if (e < 0 || e > 1) {
-
-                                    while (e < 0 || e > 1) {
-
-                                        e = params.epistasis.nextDouble();
-                                    }
-                                }
-
-                                seg1fitness_new += (Math.log10(1 - sd) + Math.log10(1+e));
+                                seg1fitness_new += (Math.log10(1 - sd));
                             }
 
                             for (int s2 = 0; s2 < n_b_seg2; s2++) {
@@ -1136,21 +1071,12 @@ public class moranReassortment implements EpiModel {
                                     while (sb < 0 || sb > 1) {
 
                                         sb = params.benDFE.nextDouble();
-                                        //System.out.println("sb "+sb);
 
 
                                     }
                                 }
 
-                                if (e < 0 || e > 1) {
-
-                                    while (e < 0 || e > 1) {
-
-                                        e = params.epistasis.nextDouble();
-                                    }
-                                }
-
-                                seg2fitness_new += (Math.log10(1 + sb)+ Math.log10(1+e));
+                                seg2fitness_new += (Math.log10(1 + sb));
                             }
 
                             for (int s2 = 0; s2 < n_d_seg2; s2++) {
@@ -1166,15 +1092,7 @@ public class moranReassortment implements EpiModel {
                                     }
                                 }
 
-                                if (e < 0 || e > 1) {
-
-                                    while (e < 0 || e > 1) {
-
-                                        e = params.epistasis.nextDouble();
-                                    }
-                                }
-
-                                seg2fitness_new += (Math.log10(1 - sd)+ Math.log10(1+e));
+                                seg2fitness_new += (Math.log10(1 - sd));
                             }
 
 
@@ -1255,8 +1173,6 @@ public class moranReassortment implements EpiModel {
         System.out.println("med_var: "+var.getPercentile(50)+", geo_mean: "+var.getGeometricMean());
 
 
-        //write out fitDistOverTime
-
         Set<Double> generations = fitDistTime.keySet();
 
         List<Double> sorted_generations = new ArrayList<Double>();
@@ -1265,47 +1181,6 @@ public class moranReassortment implements EpiModel {
 
         Collections.sort(sorted_generations);
 
-//        try {
-//            writer4.write("Time,Fitness_bin,Frequency\n");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        for (Double gen : sorted_generations) {
-//
-//            Map<String, Double> fitBinFreq = fitDistTime.get(gen);
-//
-//            Set<String> fitBinString = fitBinFreq.keySet();
-//
-//            List<String> sortedBinString = new ArrayList<String>();
-//
-//            sortedBinString.addAll(fitBinString);
-//
-//            Collections.sort(sortedBinString, stringComparator);
-//
-//
-//            for (String b : sortedBinString) {
-//
-//                Double freq = fitBinFreq.get(b);
-//
-//                try {
-//                    writer4.write(gen + "," + b + "," + freq + "\n");
-//                    writer4.flush();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//        }
-//
-//
-//        try {
-//            writer1.close();
-//            writer4.close();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
 
 
