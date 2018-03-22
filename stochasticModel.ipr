@@ -1,57 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ArtifactManager">
-    <artifact type="jar" name="twoPatch">
-      <output-path>$PROJECT_DIR$/out/artifacts/twoPatch</output-path>
-      <root id="archive" name="twoPatch.jar">
+    <artifact type="jar" name="moranModel_tree">
+      <output-path>$PROJECT_DIR$/out/artifacts/moranModel_tree</output-path>
+      <root id="archive" name="moranModel_tree.jar">
         <element id="directory" name="META-INF">
-          <element id="file-copy" path="$PROJECT_DIR$/twoPatch/src/META-INF/MANIFEST.MF" />
+          <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
         </element>
-        <element id="module-output" name="twoPatch" />
+        <element id="module-output" name="moranModel" />
         <element id="module-output" name="stochasticModel" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-tests.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-javadoc.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-sources.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-test-sources.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$PROJECT_DIR$/../ssj/lib/ssj.jar" path-in-jar="/" />
+        <element id="module-output" name="reassortmentTauLeap" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy/simulateGenealogy.jar" path-in-jar="/" />
         <element id="extracted-dir" path="$PROJECT_DIR$/../colt/lib/colt.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../java/commons-math3-3.6/commons-math3-3.6.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../java/commons-math3-3.6/commons-math3-3.6-javadoc.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../ssj/lib/ssj.jar" path-in-jar="/" />
       </root>
     </artifact>
-    <artifact type="jar" name="singlePatch">
-      <output-path>$PROJECT_DIR$/out/artifacts/singlePatch</output-path>
-      <root id="archive" name="singlePatch.jar">
+    <artifact type="jar" name="moranModel">
+      <output-path>$PROJECT_DIR$/out/artifacts/moranModel</output-path>
+      <root id="archive" name="moranModel.jar">
         <element id="directory" name="META-INF">
-          <element id="file-copy" path="$PROJECT_DIR$/singlePatch/src/META-INF/MANIFEST.MF" />
+          <element id="file-copy" path="$PROJECT_DIR$/moranModel/src/META-INF/MANIFEST.MF" />
         </element>
-        <element id="module-output" name="singlePatch" />
+        <element id="module-output" name="moranModel" />
         <element id="module-output" name="stochasticModel" />
+        <element id="module-output" name="reassortmentTauLeap" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../java/commons-math3-3.6/commons-math3-3.6.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../java/commons-math3-3.6/commons-math3-3.6-javadoc.jar" path-in-jar="/" />
         <element id="extracted-dir" path="$PROJECT_DIR$/../colt/lib/colt.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy/simulateGenealogy.jar" path-in-jar="/" />
+        <element id="dir-copy" path="$PROJECT_DIR$" />
         <element id="extracted-dir" path="$PROJECT_DIR$/../ssj/lib/ssj.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-tests.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-javadoc.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-sources.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-test-sources.jar" path-in-jar="/" />
-      </root>
-    </artifact>
-    <artifact type="jar" name="singlePatchDel">
-      <output-path>$PROJECT_DIR$/out/artifacts/singlePatchDel</output-path>
-      <root id="archive" name="singlePatchDel.jar">
-        <element id="directory" name="META-INF">
-          <element id="file-copy" path="$PROJECT_DIR$/singlePatch/src/META-INF/MANIFEST.MF" />
-        </element>
-        <element id="module-output" name="singlePatch" />
-        <element id="module-output" name="stochasticModel" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-tests.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-javadoc.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-sources.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$USER_HOME$/Java/commons-math3-3.2/commons-math3-3.2-test-sources.jar" path-in-jar="/" />
+        <element id="library" level="project" name="stochasticModel" />
         <element id="extracted-dir" path="$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy/simulateGenealogy.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$PROJECT_DIR$/../ssj/lib/ssj.jar" path-in-jar="/" />
-        <element id="extracted-dir" path="$PROJECT_DIR$/../colt/lib/colt.jar" path-in-jar="/" />
       </root>
     </artifact>
   </component>
@@ -59,7 +40,6 @@
     <option name="myUseUcmModel" value="true" />
   </component>
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="Javac" />
     <resourceExtensions />
     <wildcardResourcePatterns>
       <entry name="?*.properties" />
@@ -78,6 +58,7 @@
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="1.7" />
   </component>
   <component name="CopyrightManager" default="" />
   <component name="DependencyValidationManager">
@@ -228,15 +209,15 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/singlePatch/singlePatch.iml" filepath="$PROJECT_DIR$/singlePatch/singlePatch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moranModel/moranModel.iml" filepath="$PROJECT_DIR$/moranModel/moranModel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reassortmentTauLeap/reassortmentTauLeap.iml" filepath="$PROJECT_DIR$/reassortmentTauLeap/reassortmentTauLeap.iml" />
       <module fileurl="file://$PROJECT_DIR$/stochasticModel.iml" filepath="$PROJECT_DIR$/stochasticModel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/twoPatch/twoPatch.iml" filepath="$PROJECT_DIR$/twoPatch/twoPatch.iml" />
     </modules>
   </component>
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" default="true" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">
@@ -253,35 +234,40 @@
     </library>
     <library name="commons-math3-3">
       <CLASSES>
-        <root url="file://$USER_HOME$/Java/commons-math3-3.2" />
+        <root url="file://$PROJECT_DIR$/../java/commons-math3-3.6" />
       </CLASSES>
       <JAVADOC>
-        <root url="file://$USER_HOME$/Java/commons-math3-3.2/docs/apidocs" />
+        <root url="file://$PROJECT_DIR$/../java/commons-math3-3.6/docs/apidocs" />
       </JAVADOC>
-      <SOURCES>
-        <root url="file://$USER_HOME$/Java/commons-math3-3.2" />
-      </SOURCES>
-      <jarDirectory url="file://$USER_HOME$/Java/commons-math3-3.2" recursive="false" />
-      <jarDirectory url="file://$USER_HOME$/Java/commons-math3-3.2" recursive="false" type="SOURCES" />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/../java/commons-math3-3.6" recursive="false" />
     </library>
     <library name="simulateGenealogy">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy/simulateGenealogy.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy/simulateGenealogy.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy/simulateGenealogy.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="treeWriter">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../simulateGenealogy/out/artifacts/treeWriter_jar/treeWriter.jar!/" />
+        <root url="file://$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="file://$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy" />
+      </SOURCES>
+      <jarDirectory url="file://$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy" recursive="false" />
+      <jarDirectory url="file://$PROJECT_DIR$/../simulateGenealogy/out/artifacts/simulateGenealogy" recursive="false" type="SOURCES" />
+    </library>
+    <library name="src">
+      <CLASSES />
+      <JAVADOC />
+      <SOURCES>
+        <root url="file://$PROJECT_DIR$/src" />
+      </SOURCES>
+    </library>
+    <library name="stochasticModel">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="file://$PROJECT_DIR$/src" />
+      </SOURCES>
     </library>
   </component>
 </project>
-

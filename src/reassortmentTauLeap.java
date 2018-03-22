@@ -1,6 +1,7 @@
 import cern.colt.list.DoubleArrayList;
 import cern.jet.random.Poisson;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.rank.Max;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,18 +43,15 @@ public class reassortmentTauLeap implements EpiModel {
     public void runSimulation(EpiParams params, int sim_no, double [][] tmrca_seg1, double [][] tmrca_seg2, double [][] fitness, double[][] fitnessv ) {
 
 
-        params.print();
+        //params.print();
 
         System.out.println("x");
-        //icoMatrix.initialize((int)1e6);
         int patch = 1;
 
-        File outputfile = new File("one_patch_model_reassortants_antigenicMu_"+params.antigenicMu_a+"_s_"+params.s_b1+"_psi_"+params.psi+"_rho_"+params.mutnRate+"_"+"_epsi_"+params.epsilon_endemic+
-                "_D_"+params.durationOfInfection+"_W_"+params.waningImmunity+"_R0_"+params.R0+"_simTime_"+params.simulationTime+"yrs_p_"+params.p+"_epistasis_"+params.e_b+"_simNo_"+(sim_no+1)+".csv");
+        File outputfile = new File("one_patch_model_reassortants_antigenicMu_"+params.rawMutationRate+"_sb1_"+params.p_b_seg1+"_sb2_"+params.p_b_seg2+"_sd1_"+params.p_d_seg1+"_sd1_"+params.p_d_seg2+"_psi_"+params.psi+"_D_"+params.durationOfInfection+"_W_"+params.waningImmunity+"_R0_"+params.R0+"_simTime_"+params.simulationTime+"yrs_simNo_"+(sim_no+1)+".csv");
 
 
-        File cumIncid = new File("cumulative_Incidence_antigenicMu_"+params.antigenicMu_a+"_s_"+params.s_b1+"_psi_"+params.psi+"_rho_"+params.mutnRate+"_"+"_epsi_"+params.epsilon_endemic+
-                "_D_"+params.durationOfInfection+"_W_"+params.waningImmunity+"_R0_"+params.R0+"_simTime_"+params.simulationTime+"yrs_p_"+params.p+"_epistasis_"+params.e_b+"_simNo_"+(sim_no+1)+".csv");
+        File cumIncid = new File("cumulative_Incidence_antigenicMu_"+params.rawMutationRate+"_sb1_"+params.p_b_seg1+"_sb2_"+params.p_b_seg2+"_sd1_"+params.p_d_seg1+"_sd1_"+params.p_d_seg2+"_psi_"+params.psi+"_D_"+params.durationOfInfection+"_W_"+params.waningImmunity+"_R0_"+params.R0+"_simTime_"+params.simulationTime+"yrs_simNo_"+(sim_no+1)+".csv");
 
         //File outputfile2 = new File("tmrca_and_fitness_through_time_p_"+params.p+"_psi_"+params.psi+"_neutralMu_"+params.neutralMu+"_sn_"+params.s_n+"_epistasis_"+params.e_b+"_simNo_"+sim_no+".csv");
         try {
@@ -140,10 +138,10 @@ public class reassortmentTauLeap implements EpiModel {
         DescriptiveStatistics stats2 = new DescriptiveStatistics();
         DescriptiveStatistics stats3 = new DescriptiveStatistics();
 
-        tmrca_seg1[sim_no] = new double[61];
-        tmrca_seg2[sim_no] = new double[61];
-        fitness[sim_no] = new double[61];
-        fitnessv[sim_no] = new double[61];
+        tmrca_seg1[sim_no] = new double[101];
+        tmrca_seg2[sim_no] = new double[101];
+        fitness[sim_no] = new double[101];
+        fitnessv[sim_no] = new double[101];
         int ind = 0;
 
         while (t_curr <= maxTime) {
@@ -157,8 +155,9 @@ public class reassortmentTauLeap implements EpiModel {
             if(t_curr==sampleTime) {
                 updateDiversity(I_matrix_curr);
 
+                System.out.println(t_curr+","+Y_curr+","+Yco_curr+","+Yr_primary_curr+","+(t_curr-tmrca1)/365.25+","+diversity1/365.25);
 
-                System.out.println(t_curr + "," + (60-((t_curr-tmrca1)/365.25)) + "," + diversity1 / 365.25+"," + (60-((t_curr-tmrca2)/365.25)) + "," + diversity2 / 365.25+","+popFitness+","+popFitnessVariance+","+(tmrca1-tmrca2)/365.25);
+                //System.out.println(t_curr + "," + (60-((t_curr-tmrca1)/365.25)) + "," + diversity1 / 365.25+"," + (60-((t_curr-tmrca2)/365.25)) + "," + diversity2 / 365.25+","+popFitness+","+popFitnessVariance+","+(tmrca1-tmrca2)/365.25);
                 sampleTime +=365.25;
 
 
@@ -169,7 +168,7 @@ public class reassortmentTauLeap implements EpiModel {
                 ind++;
 
 
-                if(t_curr/365.25 > 30) {
+                if(t_curr/365.25 > 70) {
                     stats1.addValue(tmrca1/365.25);
                     stats2.addValue(tmrca2/365.25);
                     stats3.addValue((tmrca1-tmrca2)/365.25);
@@ -182,7 +181,7 @@ public class reassortmentTauLeap implements EpiModel {
             try {
 
 
-                writer1.write(t_curr+","+X_curr+","+Y_curr+","+Yco_curr+","+Yr_primary_curr+","+Yr_curr+","+Z_curr+","+popFitness+","+ popFitnessVariance+"\n");
+                writer1.write(t_curr+","+X_curr+","+Y_curr+","+Yco_curr+","+Yr_primary_curr+","+Yr_curr+","+Z_curr+","+popFitness+","+ popFitnessVariance+","+diversity1/365+","+tmrca1/365.25+"\n");
                 writer1.flush();
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -215,6 +214,7 @@ public class reassortmentTauLeap implements EpiModel {
             //System.out.println("evolve_large:"+evolve_large+" q "+params.q+" p "+params.p);
 
 
+            //System.out.println(BSIs+","+BSIco+","+BIsIs);
             //neutral fitness effect - 1/Ne (population of infected)
             //params.s_n = 1.0/(double)Y_curr;
 
@@ -231,15 +231,7 @@ public class reassortmentTauLeap implements EpiModel {
             rates.add(muR);
 
             rates.add(gammaR);
-            rates.add(evolve);
-            rates.add(neg_evolve);
-            rates.add(evolve_large);
-            rates.add(weak_evolve);
 
-            double neutralMu = params.neutralMu;
-            //rates.add(lethal_evolve);
-
-            //rates.add(0.0); // seg 2 evolution is same as seg 1
 
             t_next = tau+t_curr;
             Poisson poisson;
@@ -269,6 +261,8 @@ public class reassortmentTauLeap implements EpiModel {
                 poisson = new Poisson(tau*rates.get(event), params.randomGenerator);
                 int num = poisson.nextInt();
 
+                //System.out.println(Y_curr+","+Yco_curr+","+num);
+
                 //System.out.println(">"+num);
                 switch(event) {
 
@@ -292,12 +286,7 @@ public class reassortmentTauLeap implements EpiModel {
                         cumIs += minNo;
                         j = 0;
 
-                        int I_index;
-                        //Integer parent = (int)Double.NEGATIVE_INFINITY;
-
                         fitnessWeights = calculateWeights(I_matrix_curr);
-
-
 
 
                         while(j<minNo) {
@@ -321,6 +310,92 @@ public class reassortmentTauLeap implements EpiModel {
 
                             Double newFitness = iMatrix.getFitness(parent);
 
+                            //fitness change occurs at transmission
+
+                            Integer b_mut_seg1 = Poisson.staticNextInt(params.p_b_seg1 * params.rawMutationRate * 0.5); //double check if rate vs mean
+                            Integer d_mut_seg1 = Poisson.staticNextInt(params.p_d_seg1 * params.rawMutationRate * 0.5);
+                            Integer b_mut_seg2 = Poisson.staticNextInt(params.p_b_seg2 * params.rawMutationRate * 0.5);
+                            Integer d_mut_seg2 = Poisson.staticNextInt(params.p_d_seg2 * params.rawMutationRate * 0.5);
+
+
+//                            newFitness += Math.log10(1+params.benDFE.nextDouble())* (b_mut_seg1+b_mut_seg2);
+//                            newFitness += Math.pow(Math.log10(1-params.delDFE.nextDouble()), d_mut_seg1+d_mut_seg2);
+//
+                            double seg1fitness = 0.0;
+                            double seg2fitness = 0.0;
+
+                            for (int s1 = 0; s1 < b_mut_seg1; s1++) {
+
+                                double sb = params.benDFE.nextDouble();
+
+                                if(sb < 0 || sb > 1) {
+
+                                    while(sb < 0 || sb > 1) {
+
+                                        sb = params.benDFE.nextDouble();
+
+                                    }
+                                }
+
+                                seg1fitness += Math.log10(1 + sb);
+
+                            }
+
+                            for (int s1 = 0; s1 < d_mut_seg1; s1++) {
+
+                                double sd = params.delDFE.nextDouble();
+
+                                if(sd < 0 || sd > 1) {
+
+                                    while(sd < 0 || sd > 1) {
+
+                                        sd = params.delDFE.nextDouble();
+
+                                    }
+                                }
+
+                                seg1fitness += Math.log10(1 - sd);
+
+                            }
+
+                            for (int s2 = 0; s2 < b_mut_seg2; s2++) {
+
+                                double sb = params.benDFE.nextDouble();
+
+                                if(sb < 0 || sb > 1) {
+
+                                    while(sb < 0 || sb > 1) {
+
+                                        sb = params.benDFE.nextDouble();
+
+                                    }
+                                }
+
+                                seg2fitness += Math.log10(1 + sb);
+
+                            }
+                            for (int s2 = 0; s2 < d_mut_seg2; s2++) {
+
+                                double sd = params.delDFE.nextDouble();
+
+                                if(sd < 0 || sd > 1) {
+
+                                    while(sd < 0 || sd > 1) {
+
+                                        sd = params.delDFE.nextDouble();
+
+                                    }
+                                }
+
+                                seg1fitness += Math.log10(1 - sd);
+                            }
+
+
+
+                            newFitness += seg1fitness+seg2fitness;
+
+
+
                             //log infection in the corresponding vectors;
                             iMatrix.logId(I_matrix_length);
                             iMatrix.logBirth(t_curr);
@@ -329,7 +404,7 @@ public class reassortmentTauLeap implements EpiModel {
                             iMatrix.logParentCo((int) Double.NEGATIVE_INFINITY);
                             iMatrix.logReassortant(reassortant);
                             iMatrix.logFitness(newFitness);
-                            iMatrix.logSegFitness(iMatrix.getSegFitness(parent));
+                            iMatrix.logSegFitness(iMatrix.getSegFitness(parent)+seg1fitness);
                             iMatrix.logSeg1parent(parent);
                             iMatrix.logSeg2parent(parent);
 
@@ -478,6 +553,84 @@ public class reassortmentTauLeap implements EpiModel {
                             if(Double.isNaN(newFitness)) {
                                 System.out.println(5);
                             }
+
+                            Integer b_mut_seg1 = Poisson.staticNextInt(params.p_b_seg1 * params.rawMutationRate * 0.5); //double check if rate vs mean
+                            Integer d_mut_seg1 = Poisson.staticNextInt(params.p_d_seg1 * params.rawMutationRate * 0.5);
+                            Integer b_mut_seg2 = Poisson.staticNextInt(params.p_b_seg2 * params.rawMutationRate * 0.5);
+                            Integer d_mut_seg2 = Poisson.staticNextInt(params.p_d_seg2 * params.rawMutationRate * 0.5);
+
+                            double seg1fitness_new = 0.0;
+                            double seg2fitness_new = 0.0;
+
+                            for(int s1=0; s1<b_mut_seg1; s1++) {
+
+                                double sb = params.benDFE.nextDouble();
+
+                                if(sb < 0 || sb > 1) {
+
+                                    while(sb < 0 || sb > 1) {
+
+                                        sb = params.benDFE.nextDouble();
+
+                                    }
+                                }
+
+                                seg1fitness_new+= Math.log10(1+sb);
+                            }
+                            for(int s1=0; s1<d_mut_seg1; s1++) {
+
+                                double sd = params.delDFE.nextDouble();
+
+                                if(sd < 0 || sd > 1) {
+
+                                    while(sd < 0 || sd > 1) {
+
+                                        sd = params.delDFE.nextDouble();
+
+                                    }
+                                }
+
+                                seg1fitness_new += Math.log10(1 - sd);
+                            }
+
+                            for(int s2=0; s2<b_mut_seg2; s2++) {
+
+                                double sb = params.benDFE.nextDouble();
+
+                                if(sb < 0 || sb > 1) {
+
+                                    while(sb < 0 || sb > 1) {
+
+                                        sb = params.benDFE.nextDouble();
+
+                                    }
+                                }
+
+                                seg2fitness_new+= Math.log10(1 + sb);
+                            }
+
+                            for(int s2=0; s2<d_mut_seg2; s2++) {
+
+                                double sd = params.delDFE.nextDouble();
+
+                                if(sd < 0 || sd > 1) {
+
+                                    while(sd < 0 || sd > 1) {
+
+                                        sd = params.delDFE.nextDouble();
+
+                                    }
+                                }
+
+                                seg2fitness_new += Math.log10(1 - sd);
+
+                            }
+
+
+
+                            newFitness += seg1fitness_new + seg2fitness_new;
+
+
                             iMatrix.logId(I_matrix_length);
                             iMatrix.logBirth(t_curr);
                             iMatrix.logDeath(Double.NEGATIVE_INFINITY);
@@ -485,7 +638,7 @@ public class reassortmentTauLeap implements EpiModel {
                             iMatrix.logParentCo(parent_co);
                             iMatrix.logReassortant(reassortant);
                             iMatrix.logFitness(newFitness);
-                            iMatrix.logSegFitness(seg1Fitness);
+                            iMatrix.logSegFitness(seg1Fitness + seg1fitness_new);
                             iMatrix.logSeg1parent(seg1parent);
                             iMatrix.logSeg2parent(seg2parent);
 
@@ -524,16 +677,24 @@ public class reassortmentTauLeap implements EpiModel {
 
                         j = 0;
 
+                        //fitnessWeights = calculateWeights(I_matrix_curr);
+                        fitnessWeights = calculateWeights(I_matrix_curr);
+
+
                         while(j<minNo){
 
                             int recipient_index = (int)Math.floor(Math.random()*I_matrix_curr.size());
                             Integer recipientParent = I_matrix_curr.get(recipient_index);
                             I_matrix_curr.remove(recipientParent);
-
+                            fitnessWeights.remove(recipient_index);
                             //donor virus/host
+                            //fitnessWeights = calculateWeights(I_matrix_curr);
 
-                            int donor_index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+                            int donor_index = chooseParent(fitnessWeights);
+                            //(int)Math.floor(Math.random()*I_matrix_curr.size()); // if choosing parent randomly
                             int donorParent = I_matrix_curr.get(donor_index);
+
+
 
                             reassortant = iMatrix.getReassortant(recipientParent);
                             //should I have update the I_matrix for the recipient virus - will appear as if it is dead
@@ -691,149 +852,149 @@ public class reassortmentTauLeap implements EpiModel {
 
                         break;
 
-                    case 11:
-
-                        j = 0;
-
-                        // seg 1 evolution
-                        while(j<num){
-
-                            int index = (int)Math.floor(Math.random()*I_matrix_curr.size());
-                            Integer evolvedIs = I_matrix_curr.get(index);
-                            double currentFitness = iMatrix.getFitness(evolvedIs);
-                            //double newFitness = currentFitness *((1+(params.dfe.nextDouble())));
-
-                            if(Double.isInfinite(currentFitness)) {
-                                while(Double.isInfinite(currentFitness)) {
-
-                                    index = (int)Math.floor(Math.random()*I_matrix_curr.size());
-                                    evolvedIs = I_matrix_curr.get(index);
-                                    currentFitness = iMatrix.getFitness(evolvedIs);
-                                }
-                            }
-                            //double newFitness = currentFitness + Math.pow(Math.log10(1 + params.s_b), Math.exp(params.e_b));
-                            double newFitness = currentFitness + (Math.log10(1 + params.s_b1))*Math.exp(params.e_b);
-
-                            if(Double.isNaN(newFitness)) {
-                                System.out.println(1);
-                            }
-
-                            //double newFitness = currentFitness + Math.log10((1+(params.expDFE.nextDouble())));
-
-
-                            iMatrix.setFitness(evolvedIs, newFitness);
-                            iMatrix.setSegFitness(evolvedIs, newFitness);   // keeps track of seg1 fitness, when neutral these total and seg fitnesses are the same
-
-                            j++;
-                        }
-                        break;
-
-                    case 12:
-
-                        // negative selection on seg1
-
-                        j = 0;
-                        Collections.shuffle(I_matrix_curr);
-
-                        while(j<num){
-
-                            //int index = (int)Math.floor(Math.random()*I_matrix_curr.size());
-                            int index = 0;
-                            Integer evolvedIs = I_matrix_curr.get(j);
-                            double currentFitness = iMatrix.getFitness(evolvedIs);
-
-                            if(Double.isInfinite(currentFitness)) {
-                                while(Double.isInfinite(currentFitness)) {
-
-                                    index = (int)Math.floor(Math.random()*I_matrix_curr.size());
-                                    evolvedIs = I_matrix_curr.get(index);
-                                    currentFitness = iMatrix.getFitness(evolvedIs);
-                                }
-                            }
-                            double newFitness = 0.0;//currentFitness + Math.log10(1+params.s_n1); //+ Math.log10(1+epistasis_2.nextDouble());
-
-                            if(Double.isNaN(newFitness)) {
-                                System.out.println(2);
-                            }
-
-                            //iMatrix.setSegFitness(evolvedIs, newFitness);
-                            //segFitness doesn't improve...
-                            iMatrix.setFitness(evolvedIs, newFitness);
-                            iMatrix.setSegFitness(evolvedIs, newFitness);
-
-                            j++;
-                        }
-                        break;
-
-                    case 13:
-
-                        j = 0;
-
-                        // seg 1 evolution // secondary mutations - sb2
-                        while(j<num){
-
-                            int index = (int)Math.floor(Math.random()*I_matrix_curr.size());
-                            Integer evolvedIs = I_matrix_curr.get(index);
-                            double currentFitness = iMatrix.getFitness(evolvedIs);
-
-                            if(Double.isInfinite(currentFitness)) {
-                                while(Double.isInfinite(currentFitness)) {
-
-                                    index = (int)Math.floor(Math.random()*I_matrix_curr.size());
-                                    evolvedIs = I_matrix_curr.get(index);
-                                    currentFitness = iMatrix.getFitness(evolvedIs);
-                                }
-                            }
-                            double newFitness = currentFitness + (Math.log10(1 + params.s_b2));
-
-
-                            if(Double.isNaN(newFitness)) {
-                                System.out.println(3);
-                            }
-
-                            iMatrix.setFitness(evolvedIs, newFitness);
-                            iMatrix.setSegFitness(evolvedIs, newFitness);   // keeps track of seg1 fitness, when neutral these total and seg fitnesses are the same
-
-                            j++;
-                        }
-                    case 14:
-
-                        j = 0;
-
-                        // seg 2 evolution // negative selection
-
-
-                        Collections.shuffle(I_matrix_curr);
-                        while(j<num){
-
-                            //int index = (int)Math.floor(Math.random()*I_matrix_curr.size());
-                            int index = 0;
-
-                            Integer evolvedIs = I_matrix_curr.get(j);
-                            double currentFitness = iMatrix.getFitness(evolvedIs);
-
-                            if(Double.isInfinite(currentFitness)) {
-                                while(Double.isInfinite(currentFitness)) {
-
-                                    index = (int)Math.floor(Math.random()*I_matrix_curr.size());
-                                    evolvedIs = I_matrix_curr.get(index);
-                                    currentFitness = iMatrix.getFitness(evolvedIs);
-                                }
-                            }
-
-                            double newFitness = 0.0;//currentFitness + (Math.log10(1 + params.s_n2));
-
-                            if(Double.isNaN(newFitness)) {
-                                System.out.println(4);
-                            }
-
-
-
-
-                            iMatrix.setFitness(evolvedIs, newFitness);
-
-                            j++;
-                        }
+//                    case 11:
+//
+//                        j = 0;
+//
+//                        // seg 1 evolution
+//                        while(j<num){
+//
+//                            int index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+//                            Integer evolvedIs = I_matrix_curr.get(index);
+//                            double currentFitness = iMatrix.getFitness(evolvedIs);
+//                            //double newFitness = currentFitness *((1+(params.dfe.nextDouble())));
+//
+//                            if(Double.isInfinite(currentFitness)) {
+//                                while(Double.isInfinite(currentFitness)) {
+//
+//                                    index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+//                                    evolvedIs = I_matrix_curr.get(index);
+//                                    currentFitness = iMatrix.getFitness(evolvedIs);
+//                                }
+//                            }
+//                            //double newFitness = currentFitness + Math.pow(Math.log10(1 + params.s_b), Math.exp(params.e_b));
+//                            double newFitness = currentFitness + (Math.log10(1 + params.s_b1))*Math.exp(params.e_b);
+//
+//                            if(Double.isNaN(newFitness)) {
+//                                System.out.println(1);
+//                            }
+//
+//                            //double newFitness = currentFitness + Math.log10((1+(params.expDFE.nextDouble())));
+//
+//
+//                            iMatrix.setFitness(evolvedIs, newFitness);
+//                            iMatrix.setSegFitness(evolvedIs, newFitness);   // keeps track of seg1 fitness, when neutral these total and seg fitnesses are the same
+//
+//                            j++;
+//                        }
+//                        break;
+//
+//                    case 12:
+//
+//                        // negative selection on seg1
+//
+//                        j = 0;
+//                        Collections.shuffle(I_matrix_curr);
+//
+//                        while(j<num){
+//
+//                            //int index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+//                            int index = 0;
+//                            Integer evolvedIs = I_matrix_curr.get(j);
+//                            double currentFitness = iMatrix.getFitness(evolvedIs);
+//
+//                            if(Double.isInfinite(currentFitness)) {
+//                                while(Double.isInfinite(currentFitness)) {
+//
+//                                    index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+//                                    evolvedIs = I_matrix_curr.get(index);
+//                                    currentFitness = iMatrix.getFitness(evolvedIs);
+//                                }
+//                            }
+//                            double newFitness = 0.0;//currentFitness + Math.log10(1+params.s_n1); //+ Math.log10(1+epistasis_2.nextDouble());
+//
+//                            if(Double.isNaN(newFitness)) {
+//                                System.out.println(2);
+//                            }
+//
+//                            //iMatrix.setSegFitness(evolvedIs, newFitness);
+//                            //segFitness doesn't improve...
+//                            iMatrix.setFitness(evolvedIs, newFitness);
+//                            iMatrix.setSegFitness(evolvedIs, newFitness);
+//
+//                            j++;
+//                        }
+//                        break;
+//
+//                    case 13:
+//
+//                        j = 0;
+//
+//                        // seg 1 evolution // secondary mutations - sb2
+//                        while(j<num){
+//
+//                            int index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+//                            Integer evolvedIs = I_matrix_curr.get(index);
+//                            double currentFitness = iMatrix.getFitness(evolvedIs);
+//
+//                            if(Double.isInfinite(currentFitness)) {
+//                                while(Double.isInfinite(currentFitness)) {
+//
+//                                    index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+//                                    evolvedIs = I_matrix_curr.get(index);
+//                                    currentFitness = iMatrix.getFitness(evolvedIs);
+//                                }
+//                            }
+//                            double newFitness = currentFitness + (Math.log10(1 + params.s_b2));
+//
+//
+//                            if(Double.isNaN(newFitness)) {
+//                                System.out.println(3);
+//                            }
+//
+//                            iMatrix.setFitness(evolvedIs, newFitness);
+//                            iMatrix.setSegFitness(evolvedIs, newFitness);   // keeps track of seg1 fitness, when neutral these total and seg fitnesses are the same
+//
+//                            j++;
+//                        }
+//                    case 14:
+//
+//                        j = 0;
+//
+//                        // seg 2 evolution // negative selection
+//
+//
+//                        Collections.shuffle(I_matrix_curr);
+//                        while(j<num){
+//
+//                            //int index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+//                            int index = 0;
+//
+//                            Integer evolvedIs = I_matrix_curr.get(j);
+//                            double currentFitness = iMatrix.getFitness(evolvedIs);
+//
+//                            if(Double.isInfinite(currentFitness)) {
+//                                while(Double.isInfinite(currentFitness)) {
+//
+//                                    index = (int)Math.floor(Math.random()*I_matrix_curr.size());
+//                                    evolvedIs = I_matrix_curr.get(index);
+//                                    currentFitness = iMatrix.getFitness(evolvedIs);
+//                                }
+//                            }
+//
+//                            double newFitness = 0.0;//currentFitness + (Math.log10(1 + params.s_n2));
+//
+//                            if(Double.isNaN(newFitness)) {
+//                                System.out.println(4);
+//                            }
+//
+//
+//
+//
+//                            iMatrix.setFitness(evolvedIs, newFitness);
+//
+//                            j++;
+//                        }
 
 
                 }
@@ -841,6 +1002,8 @@ public class reassortmentTauLeap implements EpiModel {
             }
             t_curr = t_next;
         }
+
+        System.out.println(">"+I_matrix_length);
 
         iMatrix.patch = new ArrayList<Integer>(Collections.nCopies(iMatrix.birth.size(),patch));
 
@@ -1280,6 +1443,56 @@ public class reassortmentTauLeap implements EpiModel {
         return cumsum;
     }
 
+    private  Comparator<Integer>  comparator1 = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+
+
+            double diff = iMatrix.getFitness(o1) - iMatrix.getFitness(o2);
+            if(diff == 0) {
+
+                return 0;
+            }
+            else if(diff > 0) {
+                return 1;
+            }
+            else{
+                return -1;
+            }
+        }
+    };
+
+    private  Comparator<Integer>  comparator2 = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+
+
+
+
+            int icoParentA1 = icoMatrix.getParent1(o1);
+            int icoParentA2 = icoMatrix.getParent2(o1);
+
+            double meanIcoA_fitness = (iMatrix.getFitness(icoParentA1)+iMatrix.getFitness(icoParentA2))/2;
+
+            int icoParentB1 = icoMatrix.getParent1(o2);
+            int icoParentB2 = icoMatrix.getParent2(o2);
+
+            double meanIcoB_fitness = (iMatrix.getFitness(icoParentB1)+iMatrix.getFitness(icoParentB2))/2;
+
+            double diff = meanIcoA_fitness - meanIcoB_fitness;
+
+            if(diff == 0) {
+
+                return 0;
+            }
+            else if(diff > 0) {
+                return 1;
+            }
+            else{
+                return -1;
+            }
+        }
+    };
 
     private List<Double> calculateWeights(List<Integer> I_matrix_curr) {
 
@@ -1287,9 +1500,17 @@ public class reassortmentTauLeap implements EpiModel {
         List<Double> fitnessValues = new ArrayList<Double>();
         List<Double> relativeFitnessValues = new ArrayList<Double>();
 
-        Collections.sort(I_matrix_curr, comparator);
+//        Double.isN
 
+        try {
+            Collections.sort(I_matrix_curr, comparator1);
+        }
+        catch(Exception e){
 
+            int y = iMatrix.fitness.indexOf(Double.NaN);
+            System.out.println("class: ");
+            throw new RuntimeException(e);
+        }
         for(Integer i: I_matrix_curr) {
 
             fitnessValues.add(iMatrix.getFitness(i));
@@ -1315,6 +1536,55 @@ public class reassortmentTauLeap implements EpiModel {
         //return relativeFitnessValues;
 
     }
+
+    private List<Double> calculateIcoWeights(List<Integer> Ico_matrix_curr) {
+
+        List<Double> cumulativeWeights = new ArrayList<Double>();
+        List<Double> fitnessValues = new ArrayList<Double>();
+        List<Double> relativeFitnessValues = new ArrayList<Double>();
+
+        Collections.sort(Ico_matrix_curr, comparator2);
+
+
+        for(Integer i: Ico_matrix_curr) {
+
+            int icoParent1 = icoMatrix.getParent1(i);
+            int icoParent2 = icoMatrix.getParent2(i);
+
+            double meanIco_fitness = (iMatrix.getFitness(icoParent1)+iMatrix.getFitness(icoParent2))/2;
+
+
+            fitnessValues.add(meanIco_fitness);
+        }
+
+        //Double minFit = Collections.min(fitnessValues);
+        Double maxFit = Collections.max(fitnessValues);
+
+
+        for(Integer i: Ico_matrix_curr) {
+
+
+            int icoParent1 = icoMatrix.getParent1(i);
+            int icoParent2 = icoMatrix.getParent2(i);
+
+            double meanIco_fitness = (iMatrix.getFitness(icoParent1)+iMatrix.getFitness(icoParent2))/2;
+
+
+            //Double fitness = iMatrix.getFitness(i);
+
+
+            Double relfitness = meanIco_fitness/maxFit;//(Math.pow(10, fitness-maxFit));//Math.log10(Math.pow(10, fitness/maxFit));//(fitness/maxFit)-1.0);
+
+
+            relativeFitnessValues.add(relfitness);
+        }
+        //int count = Collections.frequency(relativeFitnessValues,0.0);
+
+        return relativeFitnessValues;
+        //return relativeFitnessValues;
+
+    }
+
 
 
     private List<Double> calculateWeights(List<Integer> I_matrix_curr, double meanPopFitness) {
@@ -1469,101 +1739,54 @@ public class reassortmentTauLeap implements EpiModel {
 
         EpiParams params = new EpiParams();
 
+        int no_of_sims = 1;
+        boolean getTrees = false;
+
+        double[][] tmrca_seg1 = new double[no_of_sims][101];
+        double[][] tmrca_seg2 = new double[no_of_sims][101];
+        double[][] fitness = new double[no_of_sims][101];
+        double[][] fitnessv = new double[no_of_sims][101];
+
+        //String treeFilename = "tree_+n_lineages+"N_"+ params.rawMutationRate+"_sb1_"+params.p_b_seg1+"_sb2_"+params.p_b_seg2+"_sd1_"+params.p_d_seg1+"_sd1_"+params.p_d_seg2+"_psi_"+params.psi+"_D_"+params.durationOfInfection+"_W_"+params.waningImmunity+"_R0_"+params.R0+"_simTime_"+params.simulationTime+"yrs_simNo_"+(sim_no+1)+".csv")+"_samplePeriod_"+(Math.ceil(sampleStartTime/365.25))+"_to_"+(Math.ceil(sampleEndTime/365.25))+"_simNo_"+simNo+"_segment_"+(i+1)+".tre");
 
 
-
-//        params.antigenicMu = Double.parseDouble(args[0]);
-//        params.s_b = Double.parseDouble(args[1]);
-        params.p = Double.parseDouble(args[0]);
-        params.q = 1-params.p;
-        params.psi = Double.parseDouble(args[1]);
-        params.antigenicMu_a = Double.parseDouble(args[2]); //small effect
-        params.s_b1 = Double.parseDouble(args[3]);
-        params.antigenicMu_b = Double.parseDouble(args[4]); //large effect
-        params.s_b2 = Double.parseDouble(args[5]);
-        params.negSel = Double.parseDouble(args[6]);//*(params.antigenicMu_a*params.p+params.antigenicMu_b*params.q); // negsel on seg1
-        params.s_n1 = Double.parseDouble(args[7]);//*(params.s_b1*params.p+params.s_b2*params.q);
-        params.neutralMu = Double.parseDouble(args[8]);//*(params.antigenicMu_a*params.p+params.antigenicMu_b*params.q);// seg2 evol
-        params.s_n2 = Double.parseDouble(args[9]);
-        boolean getTrees = Boolean.parseBoolean(args[10]);
-        int no_of_sims = Integer.parseInt(args[11]);
-
-        System.out.println("average_antigenicMu: "+(params.antigenicMu_a*params.p+params.antigenicMu_b*params.q));
-
-        double[][] tmrca_seg1 = new double[no_of_sims][61];
-        double[][] tmrca_seg2 = new double[no_of_sims][61];
-        double[][] fitness = new double[no_of_sims][61];
-        double[][] fitnessv = new double[no_of_sims][61];
+        params.p_b_seg1 = Double.parseDouble(args[0]);
+        params.p_b_seg2 = Double.parseDouble(args[1]);
+        params.p_d_seg1 = Double.parseDouble(args[2]);
+        params.p_d_seg2 = Double.parseDouble(args[3]);
+        params.rawMutationRate = Double.parseDouble(args[4]);
+        params.psi = Double.parseDouble(args[5]);
 
 
-        for(int i=0; i < no_of_sims; i++) {
+        params.print();
 
-            reassortmentTauLeap model = new reassortmentTauLeap();
-            model.runSimulation(params, i, tmrca_seg1, tmrca_seg2, fitness, fitnessv);
-
-            SimulateTree tree = new SimulateTree();
-//            tree.n_lineages = 100;
+//        for(int i=0; i < no_of_sims; i++) {
 //
-            if(getTrees) {
-                tree.sampleStartTime = 30 * 365.25;
-                tree.sampleEndTime = params.simulationEndTime;
-                tree.n_lineages = 300;
-                //System.out.println(tree.samplingSchemeForOnePatchModel);
-                tree.getTransmissionTrees(2, model, (i+1));
-            }
-
-
-        }
-
-        File tmrca_seg1_output = new File("tmrca1_and_fitness_through_time_p_"+params.p+"_psi_"+params.psi+"_antigenicMuA_"+params.antigenicMu_a+"_antigenicMuB_"+params.antigenicMu_b+"_sb2_"+params.s_b2+"_neutralMu_"+params.neutralMu+"_sn1_"+params.s_n1+"_sn2_"+params.s_n2+"_epistasis_"+params.e_b+".csv");
-        File tmrca_seg2_output = new File("tmrca2_and_fitness_through_time_p_"+params.p+"_psi_"+params.psi+"_antigenicMuA_"+params.antigenicMu_a+"_antigenicMuB_"+params.antigenicMu_b+"_sb2_"+params.s_b2+"_neutralMu_"+params.neutralMu+"_sn1_"+params.s_n1+"_sn2_"+params.s_n2+"_epistasis_"+params.e_b+".csv");
-        File fitness_output = new File("fitness_through_time_p_"+params.p+"_psi_"+params.psi+"_antigenicMuA_"+params.antigenicMu_a+"_antigenicMuB_"+params.antigenicMu_b+"_sb2_"+params.s_b2+"_neutralMu_"+params.neutralMu+"_sn1_"+params.s_n1+"_sn2_"+params.s_n2+"_epistasis_"+params.e_b+".csv");
-        //File fitnessv_output = new File("varfitness_through_time_p_"+params.p+"_psi_"+params.psi+"_neutralMu_"+params.neutralMu+"_sn_"+params.s_n+"_epistasis_"+params.e_b+"_simNo_"+sim_no+".csv");
-
-
-        try {
-            BufferedWriter writer1 = new BufferedWriter(new FileWriter(tmrca_seg1_output));
-            BufferedWriter writer2 = new BufferedWriter(new FileWriter(tmrca_seg2_output));
-            BufferedWriter writer3 = new BufferedWriter(new FileWriter(fitness_output));
-            //BufferedWriter writer4 = new BufferedWriter(new FileWriter(fitnessv_output));
-
-            for(int i=0; i < 61; i++) {
-
-                String tmrca1_time = "";
-                String tmrca1_raw = "";
-                String tmrca2_time = "";
-                String tmrca2_raw = "";
-                String fitness_string = "";
-                String fitnessv_string = "";
-
-
-                for (int j = 0; j < no_of_sims; j++) {
-
-                    tmrca1_raw += tmrca_seg1[j][i] + ",";
-                    tmrca2_raw += tmrca_seg2[j][i] + ",";
-                    tmrca1_time += (60 - tmrca_seg1[j][i]) + ",";
-                    tmrca2_time += (60 - tmrca_seg2[j][i]) + ",";
-                    fitness_string += fitness[j][i] + ",";
-                    fitnessv_string += fitnessv[j][i] + ",";
-
-
-                }
-
-                writer1.write(i + "," + tmrca1_time+tmrca1_raw + "\n");
-                writer2.write(i + "," + tmrca2_time+tmrca2_raw + "\n");
-                writer3.write(i + "," + fitness_string+fitnessv_string + "\n");
-
-                writer1.flush();
-                writer2.flush();
-                writer3.flush();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+//            //moranReassortment model = new moranReassortment();
+//            reassortmentTauLeap model = new reassortmentTauLeap();
+//
+//            model.runSimulation(params, i, tmrca_seg1, tmrca_seg2, fitness, fitnessv);
+//
+//            SimulateTree tree = new SimulateTree();
+//
+////            tree.n_lineages = 100;
+////
+//            if(getTrees) {
+//
+//                tree.sampleStartTime = 70 * 365.25;
+//                tree.sampleEndTime = params.simulationEndTime;
+//                tree.n_lineages = 300;
+//
+//                String treeFilename = "tree_N_"+tree.n_lineages+"_mu_"+ params.rawMutationRate+"_sb1_"+params.p_b_seg1+"_sb2_"+params.p_b_seg2+"_sd1_"+params.p_d_seg1+"_sd1_"+params.p_d_seg2+"_psi_"+params.psi+"_simTime_"+params.simulationTime+"yrs__samplePeriod_"+(Math.ceil(tree.sampleStartTime/365.25))+"_to_"+(Math.ceil(tree.sampleEndTime/365.25))+"_simNo_"+(i+1)+"_segment_";
+//
+//                //System.out.println(tree.samplingSchemeForOnePatchModel);
+//                //tree.getTransmissionTrees(2, model, treeFilename, (i+1));
+//            }
+//
+//
+//        }
 
 
     }
-
 }
 

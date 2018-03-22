@@ -316,7 +316,12 @@ public class reassortmentTauLeapB implements EpiModel {
                                 cumIrs++;
                             }
 
+                            //fitness changes at transmission
+
                             Double newFitness = iMatrix.getFitness(parent);
+
+                            Integer p_b = Poisson.staticNextInt(params.p_ben1);
+                            Integer p_d = Poisson.staticNextInt(0.2);
 
                             //log infection in the corresponding vectors;
                             iMatrix.logId(I_matrix_length);
@@ -1441,24 +1446,24 @@ public class reassortmentTauLeapB implements EpiModel {
         double[][] fitnessv = new double[no_of_sims][61];
 
 
-        for(int i=0; i < no_of_sims; i++) {
-
-            reassortmentTauLeapB model = new reassortmentTauLeapB();
-            model.runSimulation(params, i, tmrca_seg1, tmrca_seg2, fitness, fitnessv);
-
-            SimulateTree tree = new SimulateTree();
-//            tree.n_lineages = 100;
+//        for(int i=0; i < no_of_sims; i++) {
 //
-            if(getTrees) {
-                tree.sampleStartTime = 30 * 365.25;
-                tree.sampleEndTime = params.simulationEndTime;
-                tree.n_lineages = 300;
-                //System.out.println(tree.samplingSchemeForOnePatchModel);
-                tree.getTransmissionTrees(2, model, (i+1));
-            }
-
-
-        }
+//            reassortmentTauLeapB model = new reassortmentTauLeapB();
+//            model.runSimulation(params, i, tmrca_seg1, tmrca_seg2, fitness, fitnessv);
+//
+//            SimulateTree tree = new SimulateTree();
+////            tree.n_lineages = 100;
+////
+//            if(getTrees) {
+//                tree.sampleStartTime = 70 * 365.25;
+//                tree.sampleEndTime = params.simulationEndTime;
+//                tree.n_lineages = 300;
+//                //System.out.println(tree.samplingSchemeForOnePatchModel);
+//                tree.getTransmissionTrees(2, model, (i+1));
+//            }
+//
+//
+//        }
 
         File tmrca_seg1_output = new File("tmrca1_through_time_antigenicMu_"+params.antigenicMu+"_nonAntigenicMu_"+params.nonAntigenicMu+"_sb_"
                                         +params.s_ben+"_sd_"+params.s_del+"_propB1_"+params.p_ben1+"_propB2_"+params.p_ben2+".csv");
